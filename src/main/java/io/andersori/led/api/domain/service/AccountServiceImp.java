@@ -9,14 +9,16 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.hibernate.exception.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.andersori.led.api.domain.entity.Account;
-import io.andersori.led.api.domain.error.ConstraintViolationDescription;
-import io.andersori.led.api.domain.error.ConstraintViolationResponseError;
+import io.andersori.led.api.domain.error.ApiError;
+import io.andersori.led.api.domain.error.ApiSubError;
+import io.andersori.led.api.domain.error.ApiValidationError;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
 import io.andersori.led.api.resource.repository.AccountRepository;
 
@@ -36,17 +38,20 @@ public class AccountServiceImp implements AccountService {
 	public Account save(Account account) throws UnprocessableEntityException {
 		Set<ConstraintViolation<Account>> violations = validator.validate(account);
 		if (!violations.isEmpty()) {
-			List<ConstraintViolationDescription> errors = new ArrayList<>();
+			List<ApiSubError> errors = new ArrayList<>();
 
 			for (ConstraintViolation<Account> violation : violations) {
-				String attribute = violation.getPropertyPath().toString();
-				String message = violation.getMessage();
+				ApiValidationError error = new ApiValidationError();
+				error.setField(violation.getPropertyPath().toString());
+				error.setMessage(violation.getMessage());
+				error.setObject("account");
+				error.setRejectedValue(violation.getInvalidValue());
 
-				errors.add(new ConstraintViolationDescription(attribute, message));
+				errors.add(error);
 			}
 
 			throw new UnprocessableEntityException(
-					new ConstraintViolationResponseError("Account Validation Error!", errors));
+					new ApiError(HttpStatus.Code.BAD_REQUEST, "Account Validation Error!", errors));
 		}
 
 		try {
@@ -76,7 +81,7 @@ public class AccountServiceImp implements AccountService {
 			 * errors.add(new ConstraintViolationDescription(attribute, message)); }
 			 */
 			throw new UnprocessableEntityException(
-					new ConstraintViolationResponseError(e.getMessage(), Arrays.asList()));
+					new ApiError(HttpStatus.Code.BAD_REQUEST , e.getMessage(), Arrays.asList()));
 		}
 
 		return account;

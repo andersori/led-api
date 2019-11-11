@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.jetty.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -18,8 +17,7 @@ import lombok.Data;
 @Data
 public class ApiError {
 
-	@JsonIgnore
-	private HttpStatus status;
+	private HttpStatus.Code status;
 	@JsonProperty(value = "timestamp")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -28,8 +26,14 @@ public class ApiError {
 	private String message;
 	private List<ApiSubError> subErrors;
 
-	public ApiError() {
+	private ApiError() {
 		timeStamp = LocalDateTime.now();
 	}
 
+	public ApiError(HttpStatus.Code status, String message, List<ApiSubError> subErrors) {
+		this();
+		this.status = status;
+		this.message = message;
+		this.subErrors = subErrors;
+	}
 }

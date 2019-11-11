@@ -3,13 +3,15 @@ package io.andersori.led.api.domain.error;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class ApiValidationError<RejectedValueType> extends ApiSubError {
+@NoArgsConstructor
+public class ApiValidationError extends ApiSubError {
 	private String object;
 	private String field;
-	private RejectedValueType rejectedValue;
+	private Object rejectedValue;
 	private String message;
 }

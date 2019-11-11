@@ -1,10 +1,9 @@
 package io.andersori.led.api.app.web.controller.route;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,9 +11,7 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.andersori.led.api.app.web.dto.AccountDto;
-import io.andersori.led.api.app.web.response.ResponseData;
 import io.andersori.led.api.app.web.util.JsonTransformer;
-import io.andersori.led.api.domain.error.ConstraintViolationDescription;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
 import io.andersori.led.api.domain.service.AccountService;
 import spark.Spark;
@@ -41,11 +38,15 @@ public class AccountController {
 				if(account.getPassword()!=null) {
 					account.setPassword(BCrypt.hashpw(account.getPassword(), BCrypt.gensalt()));
 				}
-
-				ResponseData<?> responseData = register(account);
-				responseData.setPath("/accounts");
-				res.status(responseData.getStatusCode());
-				return responseData;
+				
+				try {
+					res.status(HttpStatus.CREATED_201);
+					return register(account);
+				} catch(UnprocessableEntityException e) {
+					res.status(400);
+					return e.getError();
+				}
+				
 			}
 			res.status(400);
 			return "{\"msg\":\"Erro\"}";
@@ -58,21 +59,7 @@ public class AccountController {
 		}).collect(Collectors.toList());
 	}
 
-	public ResponseData<?> register(AccountDto account) {
-		try {
-			ResponseData<AccountDto> response = new ResponseData<AccountDto>();
-			response.setTimeStamp(LocalDateTime.now());
-			response.setMessage("Account registered successfully");
-			response.setStatusCode(201);
-			response.setBody(Arrays.asList(new AccountDto().toDto(accountService.save(account.toEntity()))));
-			return response;
-		} catch(UnprocessableEntityException e) {
-			ResponseData<ConstraintViolationDescription> response = new ResponseData<ConstraintViolationDescription>();
-			response.setTimeStamp(LocalDateTime.now());
-			response.setMessage(e.getMessage());
-			response.setStatusCode(400);
-			response.setBody(e.getError().getErrors());
-			return response;
-		}
+	public AccountDto register(AccountDto account) throws UnprocessableEntityException {
+		return new AccountDto().toDto(accountService.save(account.toEntity()));
 	}
 }

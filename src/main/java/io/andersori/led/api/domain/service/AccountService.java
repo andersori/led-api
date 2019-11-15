@@ -6,18 +6,23 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import io.andersori.led.api.domain.entity.Account;
+import io.andersori.led.api.domain.entity.RoleLed;
+import io.andersori.led.api.domain.exception.ConflictException;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
+import io.andersori.led.api.domain.policy.Restrictions;
 
 @Service
 public interface AccountService {
 
-	Account save(Account account) throws UnprocessableEntityException;
-
-	Account update(long id, Account account);
+	@Restrictions({ RoleLed.ADMIN, RoleLed.TEAM })
+	Account save(Account account) throws UnprocessableEntityException, ConflictException, ForbiddenExecutionException;
 
 	void delete(long id);
 
-	List<Account> findAll();
+	@Restrictions({ RoleLed.ADMIN, RoleLed.TEAM })
+	List<Account> findAll() throws ForbiddenExecutionException;
 
+	@Restrictions({ RoleLed.ADMIN })
 	Optional<Account> findById(long id);
 }

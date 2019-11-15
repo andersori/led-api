@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.andersori.led.api.app.web.dto.AccountDto;
+
 @Configuration
 @EnableJpaRepositories("io.andersori.led.api.resource.repository")
 @EnableTransactionManagement
@@ -72,7 +74,7 @@ public class LedConfig {
 	}
 	
 	@Bean
-    public AuditorAware<String> auditorProvider() {
+    public AuditorAware<AccountDto> auditorProvider() {
         return new AuditorAwareImpl();
     }
 	

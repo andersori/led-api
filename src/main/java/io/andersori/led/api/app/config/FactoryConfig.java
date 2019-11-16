@@ -12,7 +12,7 @@ import io.andersori.led.api.domain.service.AccountServiceImp;
 public class FactoryConfig {
 
 	@Bean
-	public AccountService acountService(ApplicationContext ctx) throws Exception {
+	public AccountService accountService(ApplicationContext ctx) throws Exception {
 		return new ServiceFactory<AccountService>(AccountService.class, AccountServiceImp.class, ctx).createInstance();
 	}
 }

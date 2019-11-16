@@ -51,7 +51,6 @@
 			<version>${javax.el.version}</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>

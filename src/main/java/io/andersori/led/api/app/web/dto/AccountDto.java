@@ -12,7 +12,7 @@ import io.andersori.led.api.domain.entity.Account;
 import lombok.Data;
 
 @Data
-public class AccountDto implements DtoMapper<Account, AccountDto> {
+public class AccountDto implements Dto<AccountDto, Account> {
 	
 	@JsonProperty(value = "userid")
 	private Long userId;
@@ -26,17 +26,20 @@ public class AccountDto implements DtoMapper<Account, AccountDto> {
 	public AccountDto() {
 		this.roles = new HashSet<RoleLed>(Arrays.asList(RoleLed.NONE));
 	}
+	
+	public AccountDto(Account account) {
+		this();
+		toDto(account);
+	}
 
 	@Override
-	public AccountDto toDto(Account entity) {
-		AccountDto dto = new AccountDto();
-		dto.setUserId(entity.getAccountId());
-		dto.setName(entity.getName());
-		dto.setPassword(entity.getPassword());
-		dto.setUsername(entity.getUsername());
-		dto.setRoles(entity.getRoles());
-		dto.setLastLogin(entity.getLastLogin());
-		return dto;
+	public void toDto(Account entity) {
+		this.setUserId(entity.getAccountId());
+		this.setName(entity.getName());
+		this.setPassword(entity.getPassword());
+		this.setUsername(entity.getUsername());
+		this.setRoles(entity.getRoles());
+		this.setLastLogin(entity.getLastLogin());
 	}
 
 	@Override

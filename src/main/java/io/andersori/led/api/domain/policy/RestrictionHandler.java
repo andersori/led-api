@@ -9,15 +9,16 @@ import java.util.List;
 
 import io.andersori.led.api.app.web.util.AccountContext;
 import io.andersori.led.api.domain.entity.RoleLed;
-import io.andersori.led.api.domain.error.ErrorInfo;
-import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
+import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 
 public class RestrictionHandler implements InvocationHandler {
 	
 	private final Object target;
+	private final Class<?> classTypeTarget;
 	
-	public RestrictionHandler(Object target) {
+	public RestrictionHandler(Object target, Class<?> classTypeTarget) {
 		this.target = target;
+		this.classTypeTarget = classTypeTarget;
 	}
 
 	@Override
@@ -36,14 +37,21 @@ public class RestrictionHandler implements InvocationHandler {
 			}
 			
 			if(canPerform) {
-				return method.invoke(target, args);
+				try {
+					return method.invoke(target, args);
+				} catch(Exception e) {
+					throw e.getCause();
+				}
 			} else {
-				ErrorInfo error = new ErrorInfo("You need more permissions.", "roles", userRoles);
-				throw new ForbiddenExecutionException("You don't have permission.", null, Arrays.asList(error));
+				throw new MethodNotAllowedException("You don't have permission to execute "+method.getName()+".", classTypeTarget);
 			}
 		}
 		
-		return method.invoke(target, args);
+		try {
+			return method.invoke(target, args);
+		} catch(Exception e) {
+			throw e.getCause();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -51,6 +59,6 @@ public class RestrictionHandler implements InvocationHandler {
 		return (T) Proxy.newProxyInstance(
 				iface.getClassLoader(),
 				new Class<?>[] {iface},
-				new RestrictionHandler(target));
+				new RestrictionHandler(target, iface));
 	}
 }

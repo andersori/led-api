@@ -16,7 +16,8 @@ import io.andersori.led.api.app.web.error.ApiError;
 import io.andersori.led.api.app.web.error.ApiSubError;
 import io.andersori.led.api.app.web.util.JsonTransformer;
 import io.andersori.led.api.domain.exception.ConflictException;
-import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
+import io.andersori.led.api.domain.exception.MethodNotAllowedException;
+import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
 import io.andersori.led.api.domain.service.AccountService;
 import spark.Request;
@@ -31,7 +32,7 @@ public class AccountController implements RouteGroup {
 	private final AccountService accountService;
 
 	@Autowired
-	public AccountController(JsonTransformer transformer, @Qualifier("acountService") AccountService accountService) {
+	public AccountController(JsonTransformer transformer, @Qualifier("accountService") AccountService accountService) {
 		this.transformer = transformer;
 		this.accountService = accountService;
 	}
@@ -39,16 +40,11 @@ public class AccountController implements RouteGroup {
 	private Object findAll(Request req, Response res) {
 		try {
 			return accountService.findAll().stream().map(user -> {
-				return new AccountDto().toDto(user);
+				return new AccountDto(user);
 			}).collect(Collectors.toList());
-		} catch (ForbiddenExecutionException e) {
-			e.setClassType(AccountDto.class.getSimpleName());
-			
+		} catch (MethodNotAllowedException e) {			
 			ApiError error = new ApiError(e.getMessage());
 			error.setClassType(e.getClassType());
-			error.setSubErrors(e.getErrors().stream().map(subError -> {
-				return new ApiSubError(subError.getField(), subError.getRejectedValue(), subError.getMessage());
-			}).collect(Collectors.toList()));
 
 			res.status(e.getHttpStatusCode());
 			return error;
@@ -66,15 +62,18 @@ public class AccountController implements RouteGroup {
 				}
 
 				res.status(HttpStatus.CREATED_201);
-				return new AccountDto().toDto(accountService.save(account.toEntity()));
+				return new AccountDto(accountService.save(account.toEntity()));
 			} catch (JsonProcessingException e) {
 				ApiError error = new ApiError(e.getMessage());
 				error.setClassType(AccountDto.class.getSimpleName());
 				return error;
-			} catch (UnprocessableEntityException | ConflictException | ForbiddenExecutionException e) {
-				if(e instanceof ForbiddenExecutionException) {
-					e.setClassType(AccountDto.class.getSimpleName());
-				}
+			} catch (ConflictException | MethodNotAllowedException e) {
+				ApiError error = new ApiError(e.getMessage());
+				error.setClassType(e.getClassType());
+
+				res.status(e.getHttpStatusCode());
+				return error;
+			} catch(UnprocessableEntityException e) {
 				ApiError error = new ApiError(e.getMessage());
 				error.setClassType(e.getClassType());
 				error.setSubErrors(e.getErrors().stream().map(subError -> {
@@ -85,7 +84,7 @@ public class AccountController implements RouteGroup {
 				return error;
 			} catch (Exception e) {
 				ApiError error = new ApiError("Unexoected Error");
-				error.setClassType(AccountDto.class.getSimpleName());
+				error.setClassType(AccountController.class.getSimpleName());
 				res.status(HttpStatus.BAD_REQUEST_400);
 				return error;
 			}
@@ -93,12 +92,45 @@ public class AccountController implements RouteGroup {
 		return null;
 	}
 
+	private Object get(Request req, Response res) {
+		if(!req.params(":id").isEmpty()) {
+			try {
+				Long id = Long.parseLong(req.params(":id"));
+				accountService.findById(id);
+			} catch(MethodNotAllowedException | NotFoundException e) {
+				ApiError error = new ApiError(e.getMessage());
+				error.setClassType(e.getClassType());
+
+				res.status(e.getHttpStatusCode());
+				return error;
+			}
+		}
+		return null;
+	}
+	
+	private Object delete(Request req, Response res) {
+		if(!req.params(":id").isEmpty()) {
+			try {
+				Long id = Long.parseLong(req.params(":id"));
+				accountService.delete(id);
+				res.status(204);
+			} catch(MethodNotAllowedException | NotFoundException e) {
+				ApiError error = new ApiError(e.getMessage());
+				error.setClassType(e.getClassType());
+
+				res.status(e.getHttpStatusCode());
+				return error;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public void addRoutes() {
-		Spark.get("", (req, res) -> {
-			return findAll(req, res);
-		}, transformer);
+		Spark.get("", (req, res) -> findAll(req, res), transformer);
+		Spark.get("/:id", (req, res) -> get(req, res), transformer);
 		Spark.post("", (req, res) -> save(req, res), transformer);
+		Spark.delete("/:id", (req, res) -> delete(req, res), transformer);
 	}
 
 }

@@ -1,5 +1,7 @@
 package io.andersori.led.api.app.config;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
@@ -24,24 +26,36 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @EnableJpaRepositories("io.andersori.led.api.resource.repository")
 @EnableTransactionManagement
-@EnableJpaAuditing(auditorAwareRef="auditorProvider")
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 @ComponentScan("io.andersori.led.api")
 public class LedConfig {
 
 	@Bean
-	public DataSource dataSource() {
+	public DataSource dataSource() throws URISyntaxException {
 		HikariConfig config = new HikariConfig();
 
+		if (System.getenv("DATABASE_URL") != null) {
+			URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+			String username = dbUri.getUserInfo().split(":")[0];
+			String password = dbUri.getUserInfo().split(":")[1];
+			String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+
+			config.setJdbcUrl(dbUrl);
+			config.setUsername(username);
+			config.setPassword(password);
+		} else {
+			config.setJdbcUrl("jdbc:postgresql://localhost:5432/led");
+			config.setUsername("led");
+			config.setPassword("postgres");
+		}
 		config.setDriverClassName("org.postgresql.Driver");
-		config.setJdbcUrl("jdbc:postgresql://localhost:5432/led");
-		config.setUsername("led");
-		config.setPassword("postgres");
 
 		return new HikariDataSource(config);
 	}
 
 	@Bean
-	public EntityManagerFactory entityManagerFactory() {
+	public EntityManagerFactory entityManagerFactory() throws URISyntaxException {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setShowSql(false);
 		vendorAdapter.setGenerateDdl(true);
@@ -68,11 +82,11 @@ public class LedConfig {
 	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
-	
+
 	@Bean
-    public AuditorAware<String> auditorProvider() {
-        return new AuditorAwareImpl();
-    }
+	public AuditorAware<String> auditorProvider() {
+		return new AuditorAwareImpl();
+	}
 
 	private Properties additionalProperties() {
 		Properties properties = new Properties();

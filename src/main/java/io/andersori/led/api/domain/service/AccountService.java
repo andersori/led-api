@@ -26,6 +26,7 @@ public interface AccountService {
 
 	@Restrictions({ RoleLed.ADMIN })
 	Account findById(Long id) throws MethodNotAllowedException, NotFoundException;
-
+	
+	@Restrictions({ RoleLed.ADMIN })
 	Account findByUsername(String username) throws NotFoundException;
 }

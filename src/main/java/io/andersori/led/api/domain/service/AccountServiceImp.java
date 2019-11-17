@@ -46,7 +46,7 @@ public class AccountServiceImp implements AccountService {
 				errors.add(error);
 			}
 
-			throw new UnprocessableEntityException("Account Validation Error.", Account.class, errors);
+			throw new UnprocessableEntityException(Account.class, errors);
 		}
 
 		if (!repository.findByUsername(account.getUsername()).isPresent()) {
@@ -60,12 +60,8 @@ public class AccountServiceImp implements AccountService {
 
 	@Override
 	public void delete(Long id) throws MethodNotAllowedException, NotFoundException {
-		if(repository.findById(id) != null) {
-			repository.deleteById(id);
-		} else {
-			throw new NotFoundException(Account.class);
-		}
-		
+		findById(id);
+		repository.deleteById(id);
 	}
 
 	@Override

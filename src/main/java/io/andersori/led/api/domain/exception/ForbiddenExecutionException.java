@@ -8,9 +8,9 @@ public class ForbiddenExecutionException extends DomainException {
 
 	private static final long serialVersionUID = 1L;
 	private static final HttpStatus.Code HTTP_STATUS = HttpStatus.Code.FORBIDDEN;
-	
-	public ForbiddenExecutionException(String message) {
-		super(message, HTTP_STATUS.getCode(), null, Arrays.asList());
+
+	public ForbiddenExecutionException(Class<?> classType) {
+		super("Please provide a token.", HTTP_STATUS.getCode(), classType.getSimpleName(), Arrays.asList());
 	}
 
 }

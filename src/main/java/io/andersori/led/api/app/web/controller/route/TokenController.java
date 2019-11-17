@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import com.auth0.jwt.JWT;
@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.andersori.led.api.app.web.dto.AccountDto;
 import io.andersori.led.api.app.web.error.ApiError;
-import io.andersori.led.api.app.web.error.ApiSubError;
 import io.andersori.led.api.app.web.util.JsonTransformer;
 import io.andersori.led.api.app.web.util.SecurityConstants;
+import io.andersori.led.api.domain.exception.CredentialsNotValidException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.service.AccountService;
 import spark.Request;
@@ -34,7 +34,7 @@ public class TokenController implements RouteGroup {
 	private final AccountService accountService;
 
 	@Autowired
-	public TokenController(JsonTransformer transformer, AccountService accountService) {
+	public TokenController(JsonTransformer transformer, @Qualifier("accountServiceImp") AccountService accountService) {
 		this.transformer = transformer;
 		this.accountService = accountService;
 	}
@@ -46,27 +46,20 @@ public class TokenController implements RouteGroup {
 				Optional<String> token = getToken(account);
 
 				Map<String, String> tokenResponse = new HashMap<String, String>();
-				
-				if (token.isPresent()) {
-					tokenResponse.put("token", token.get());
-				} else {
-					tokenResponse.put("token", " - ");
-				}
+				tokenResponse.put("token", token.get());
 
 				return tokenResponse;
 			}
-		} catch (NotFoundException e) {
+		} catch (NotFoundException | CredentialsNotValidException e) {
 			ApiError error = new ApiError(e.getMessage());
 			error.setClassType(e.getClassType());
-			error.setSubErrors(e.getErrors().stream().map(subError -> {
-				return new ApiSubError(subError.getField(), subError.getRejectedValue(), subError.getMessage());
-			}).collect(Collectors.toList()));
 
 			res.status(e.getHttpStatusCode());
 			return error;
 		} catch (Exception e) {
+			e.printStackTrace();
 			ApiError error = new ApiError("Unexoected Error");
-			error.setClassType(AccountController.class.getSimpleName());
+			error.setClassType(TokenController.class.getSimpleName());
 			res.status(HttpStatus.BAD_REQUEST_400);
 			return error;
 		}
@@ -74,7 +67,7 @@ public class TokenController implements RouteGroup {
 		return null;
 	}
 
-	private Optional<String> getToken(AccountDto account) throws NotFoundException {
+	private Optional<String> getToken(AccountDto account) throws NotFoundException, CredentialsNotValidException {
 		Optional<AccountDto> result = Optional.of(new AccountDto(accountService.findByUsername(account.getUsername())));
 
 		if (result.isPresent()) {
@@ -82,6 +75,8 @@ public class TokenController implements RouteGroup {
 				return Optional.of(SecurityConstants.TOKEN_PREFIX + JWT.create().withSubject(account.getUsername())
 						.withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
 						.sign(Algorithm.HMAC512((SecurityConstants.SECRET.getBytes()))));
+			} else {
+				throw new CredentialsNotValidException("The credentials provided do not match.", TokenController.class);
 			}
 		}
 

@@ -8,11 +8,15 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import io.andersori.led.api.app.web.dto.AccountDto;
+import io.andersori.led.api.app.web.error.ApiError;
 import io.andersori.led.api.app.web.util.AccountContext;
+import io.andersori.led.api.app.web.util.JsonTransformer;
 import io.andersori.led.api.app.web.util.SecurityConstants;
 import io.andersori.led.api.domain.entity.Account;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.service.AccountService;
 import spark.Filter;
@@ -23,10 +27,13 @@ import spark.Spark;
 @Component
 public class AuthorizationFilter implements Filter {
 
+	private final JsonTransformer transformer;
 	private final AccountService accountService;
 
 	@Autowired
-	public AuthorizationFilter(@Qualifier("accountService") AccountService accountService) {
+	public AuthorizationFilter(JsonTransformer transformer,
+			@Qualifier("accountServiceImp") AccountService accountService) {
+		this.transformer = transformer;
 		this.accountService = accountService;
 	}
 
@@ -34,32 +41,38 @@ public class AuthorizationFilter implements Filter {
 	public void handle(Request request, Response response) throws Exception {
 		if (!request.pathInfo().endsWith("token")) {
 			boolean authorized = false;
-			String msg = "{\"msg\":\"Get away!\"}";
+			String msg = "";
 
-			String token = request.headers(SecurityConstants.HEADER_STRING);
+			try {
+				String token = request.headers(SecurityConstants.HEADER_STRING);
+				if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
 
-			if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-				try {
 					String username = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes())).build()
 							.verify(token.replace(SecurityConstants.TOKEN_PREFIX, "")).getSubject();
 
 					if (username != null) {
-						try {
-							Account ac = accountService.findByUsername(username);
-							AccountContext.setAccount(new AccountDto(ac));
-							authorized = true;
-						} catch (NotFoundException e) {
-							msg = "{\"msg\":\"Invalid Username!\"}";
-						}
-
+						Account ac = accountService.findByUsername(username);
+						AccountContext.setAccount(new AccountDto(ac));
+						authorized = true;
 					}
 
-				} catch (SignatureVerificationException e) {
-					msg = "{\"msg\":\"Invalid Token!\"}";
-				} catch (JWTDecodeException e) {
-					msg = "{\"msg\":\"Invalid JSON!\"}";
+				} else {
+					throw new ForbiddenExecutionException(AuthorizationFilter.class);
 				}
 
+			} catch (SignatureVerificationException | JWTDecodeException | TokenExpiredException e) {
+				ApiError error = new ApiError(e.getMessage());
+				error.setClassType(JWT.class.getSimpleName());
+
+				msg = transformer.render(error);
+			} catch (NotFoundException | ForbiddenExecutionException e) {
+				ApiError error = new ApiError(
+						e instanceof NotFoundException ? "Account provided in token does not exist" : e.getMessage());
+				error.setClassType(e.getClassType());
+
+				msg = transformer.render(error);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			if (!authorized) {

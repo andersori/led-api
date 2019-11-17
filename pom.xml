@@ -29,9 +29,22 @@
 		<hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
 		<javax.el-api.version>3.0.0</javax.el-api.version>
 		<javax.el.version>3.0.0</javax.el.version>
+		<org.slf4j.version>1.7.29</org.slf4j.version>
 	</properties>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${org.slf4j.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>

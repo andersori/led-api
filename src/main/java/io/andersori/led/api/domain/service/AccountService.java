@@ -19,14 +19,21 @@ public interface AccountService {
 	Account save(Account account) throws UnprocessableEntityException, ConflictException, MethodNotAllowedException;
 
 	@Restrictions({ RoleLed.ADMIN })
+	Account update(Long id, Account account)
+			throws UnprocessableEntityException, ConflictException, NotFoundException, MethodNotAllowedException;
+
+	@Restrictions({ RoleLed.ADMIN })
 	void delete(Long id) throws MethodNotAllowedException, NotFoundException;
 
 	@Restrictions({ RoleLed.ADMIN })
 	List<Account> findAll() throws MethodNotAllowedException;
 
 	@Restrictions({ RoleLed.ADMIN })
-	Account findById(Long id) throws MethodNotAllowedException, NotFoundException;
-	
+	List<Account> findAll(int pageNumber, int size) throws MethodNotAllowedException;
+
 	@Restrictions({ RoleLed.ADMIN })
-	Account findByUsername(String username) throws NotFoundException;
+	Account findById(Long id) throws MethodNotAllowedException, NotFoundException;
+
+	@Restrictions({ RoleLed.ADMIN })
+	Account findByUsername(String username) throws MethodNotAllowedException, NotFoundException;
 }

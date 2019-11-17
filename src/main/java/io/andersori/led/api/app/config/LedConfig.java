@@ -4,8 +4,6 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -75,11 +73,6 @@ public class LedConfig {
     public AuditorAware<String> auditorProvider() {
         return new AuditorAwareImpl();
     }
-	
-	@Bean
-	public Validator validator(){
-		return Validation.buildDefaultValidatorFactory().getValidator();
-	}
 
 	private Properties additionalProperties() {
 		Properties properties = new Properties();

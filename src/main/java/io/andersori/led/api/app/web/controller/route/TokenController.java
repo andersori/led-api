@@ -20,6 +20,7 @@ import io.andersori.led.api.app.web.error.ApiError;
 import io.andersori.led.api.app.web.util.JsonTransformer;
 import io.andersori.led.api.app.web.util.SecurityConstants;
 import io.andersori.led.api.domain.exception.CredentialsNotValidException;
+import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.service.AccountService;
 import spark.Request;
@@ -50,7 +51,7 @@ public class TokenController implements RouteGroup {
 
 				return tokenResponse;
 			}
-		} catch (NotFoundException | CredentialsNotValidException e) {
+		} catch (NotFoundException | MethodNotAllowedException | CredentialsNotValidException e) {
 			ApiError error = new ApiError(e.getMessage());
 			error.setClassType(e.getClassType());
 
@@ -58,7 +59,7 @@ public class TokenController implements RouteGroup {
 			return error;
 		} catch (Exception e) {
 			e.printStackTrace();
-			ApiError error = new ApiError("Unexoected Error");
+			ApiError error = new ApiError(e.getMessage());
 			error.setClassType(TokenController.class.getSimpleName());
 			res.status(HttpStatus.BAD_REQUEST_400);
 			return error;
@@ -67,7 +68,8 @@ public class TokenController implements RouteGroup {
 		return null;
 	}
 
-	private Optional<String> getToken(AccountDto account) throws NotFoundException, CredentialsNotValidException {
+	private Optional<String> getToken(AccountDto account)
+			throws NotFoundException, CredentialsNotValidException, MethodNotAllowedException {
 		Optional<AccountDto> result = Optional.of(new AccountDto(accountService.findByUsername(account.getUsername())));
 
 		if (result.isPresent()) {

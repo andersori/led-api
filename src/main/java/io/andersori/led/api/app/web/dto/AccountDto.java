@@ -5,13 +5,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import io.andersori.led.api.domain.entity.RoleLed;
 import io.andersori.led.api.domain.entity.Account;
 import lombok.Data;
 
 @Data
+@JsonInclude(Include.NON_NULL)
 public class AccountDto implements Dto<AccountDto, Account> {
 	
 	@JsonProperty(value = "userid")

@@ -39,45 +39,51 @@ public class AuthorizationFilter implements Filter {
 
 	@Override
 	public void handle(Request request, Response response) throws Exception {
-		if (!request.pathInfo().endsWith("token")) {
-			boolean authorized = false;
-			String msg = "";
+		boolean authorized = false;
+		String msg = "";
 
-			try {
-				String token = request.headers(SecurityConstants.HEADER_STRING);
-				if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+		try {
+			String token = request.headers(SecurityConstants.HEADER_STRING);
+			if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
 
-					String username = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes())).build()
-							.verify(token.replace(SecurityConstants.TOKEN_PREFIX, "")).getSubject();
+				String username = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes())).build()
+						.verify(token.replace(SecurityConstants.TOKEN_PREFIX, "")).getSubject();
 
-					if (username != null) {
-						Account ac = accountService.findByUsername(username);
-						AccountContext.setAccount(new AccountDto(ac));
-						authorized = true;
-					}
-
-				} else {
-					throw new ForbiddenExecutionException(AuthorizationFilter.class);
+				if (username != null) {
+					Account ac = accountService.findByUsername(username);
+					AccountContext.setAccount(new AccountDto(ac));
+					authorized = true;
 				}
 
-			} catch (SignatureVerificationException | JWTDecodeException | TokenExpiredException e) {
-				ApiError error = new ApiError(e.getMessage());
-				error.setClassType(JWT.class.getSimpleName());
-
-				msg = transformer.render(error);
-			} catch (NotFoundException | ForbiddenExecutionException e) {
-				ApiError error = new ApiError(
-						e instanceof NotFoundException ? "Account provided in token does not exist" : e.getMessage());
-				error.setClassType(e.getClassType());
-
-				msg = transformer.render(error);
-			} catch (Exception e) {
-				e.printStackTrace();
+			} else if (request.pathInfo().endsWith("tokens")
+					|| (request.pathInfo().endsWith("accounts") && request.requestMethod().equals("POST"))) {
+				AccountDto account = new AccountDto();
+				account.setName("AUDITOR");
+				account.setUsername("led_default_auditor");
+				AccountContext.setAccount(account);
+				authorized = true;
+			} else {
+				throw new ForbiddenExecutionException(AuthorizationFilter.class);
 			}
 
-			if (!authorized) {
-				Spark.halt(401, msg);
-			}
+		} catch (SignatureVerificationException | JWTDecodeException | TokenExpiredException e) {
+			ApiError error = new ApiError(e.getMessage());
+			error.setClassType(JWT.class.getSimpleName());
+
+			msg = transformer.render(error);
+		} catch (NotFoundException | ForbiddenExecutionException e) {
+			ApiError error = new ApiError(
+					e instanceof NotFoundException ? "Account provided in token does not exist" : e.getMessage());
+			error.setClassType(e.getClassType());
+
+			msg = transformer.render(error);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
+		if (!authorized) {
+			Spark.halt(401, msg);
+		}
+
 	}
 }

@@ -12,5 +12,9 @@ public class ForbiddenExecutionException extends DomainException {
 	public ForbiddenExecutionException(Class<?> classType) {
 		super("Please provide a token.", HTTP_STATUS.getCode(), classType.getSimpleName(), Arrays.asList());
 	}
+	
+	public ForbiddenExecutionException(String message, Class<?> classType) {
+		super(message, HTTP_STATUS.getCode(), classType.getSimpleName(), Arrays.asList());
+	}
 
 }

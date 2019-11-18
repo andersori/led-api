@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import io.andersori.led.api.domain.entity.Account;
 import io.andersori.led.api.domain.entity.RoleLed;
 import io.andersori.led.api.domain.exception.ConflictException;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
@@ -25,7 +26,8 @@ public class CommandLineRunner {
 
 	@Autowired
 	public CommandLineRunner(@Qualifier("accountServiceImp") AccountService accountService)
-			throws UnprocessableEntityException, ConflictException, MethodNotAllowedException {
+			throws UnprocessableEntityException, ConflictException, MethodNotAllowedException,
+			ForbiddenExecutionException {
 		try {
 			accountService.findByUsername("admin");
 			LOGGER.info("Admin already registered.");
@@ -34,7 +36,7 @@ public class CommandLineRunner {
 			ac.setName("Administrator");
 			ac.setUsername("admin");
 			ac.setPassword(BCrypt.hashpw("1234", BCrypt.gensalt()));
-			ac.setRoles(new HashSet<RoleLed>(Arrays.asList(RoleLed.ADMIN)));
+			ac.setRoles(new HashSet<RoleLed>(Arrays.asList(RoleLed.DEFAULT, RoleLed.ADMIN)));
 			accountService.save(ac);
 			LOGGER.info("Admin saved.");
 		}

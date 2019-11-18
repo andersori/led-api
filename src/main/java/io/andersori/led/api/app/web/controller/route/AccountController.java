@@ -15,7 +15,9 @@ import io.andersori.led.api.app.web.dto.AccountDto;
 import io.andersori.led.api.app.web.error.ApiError;
 import io.andersori.led.api.app.web.error.ApiSubError;
 import io.andersori.led.api.app.web.util.JsonTransformer;
+import io.andersori.led.api.domain.entity.RoleLed;
 import io.andersori.led.api.domain.exception.ConflictException;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 import io.andersori.led.api.domain.exception.MissingInformationsException;
 import io.andersori.led.api.domain.exception.NotFoundException;
@@ -78,6 +80,10 @@ public class AccountController implements RouteGroup {
 				ObjectMapper mapper = new ObjectMapper();
 				AccountDto account = mapper.readValue(req.body(), AccountDto.class);
 
+				if (account.getRoles().size() == 1 && !account.getRoles().contains(RoleLed.DEFAULT)) {
+					account.getRoles().add(RoleLed.DEFAULT);
+				}
+
 				if (account.getPassword() != null) {
 					account.setPassword(BCrypt.hashpw(account.getPassword(), BCrypt.gensalt()));
 				}
@@ -88,7 +94,7 @@ public class AccountController implements RouteGroup {
 				ApiError error = new ApiError(e.getMessage());
 				error.setClassType(AccountDto.class.getSimpleName());
 				return error;
-			} catch (ConflictException | MethodNotAllowedException e) {
+			} catch (ForbiddenExecutionException | ConflictException | MethodNotAllowedException e) {
 				ApiError error = new ApiError(e.getMessage());
 				error.setClassType(e.getClassType());
 
@@ -164,6 +170,11 @@ public class AccountController implements RouteGroup {
 				if (!req.body().isEmpty()) {
 					ObjectMapper mapper = new ObjectMapper();
 					AccountDto accountReceived = mapper.readValue(req.body(), AccountDto.class);
+
+					if (accountReceived.getRoles().size() == 1
+							&& !accountReceived.getRoles().contains(RoleLed.DEFAULT)) {
+						accountReceived.getRoles().add(RoleLed.DEFAULT);
+					}
 
 					if (accountReceived.getPassword() != null) {
 						accountReceived.setPassword(BCrypt.hashpw(accountReceived.getPassword(), BCrypt.gensalt()));

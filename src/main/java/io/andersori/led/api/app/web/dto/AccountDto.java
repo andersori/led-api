@@ -27,7 +27,7 @@ public class AccountDto implements Dto<AccountDto, Account> {
 	private Set<RoleLed> roles;
 
 	public AccountDto() {
-		this.roles = new HashSet<RoleLed>(Arrays.asList(RoleLed.NONE));
+		this.roles = new HashSet<RoleLed>(Arrays.asList(RoleLed.DEFAULT));
 	}
 	
 	public AccountDto(Account account) {

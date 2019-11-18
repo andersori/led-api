@@ -10,5 +10,5 @@ import io.andersori.led.api.domain.entity.RoleLed;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Restrictions {
-	RoleLed[] value() default {RoleLed.NONE};
+	RoleLed[] value() default {RoleLed.DEFAULT};
 }

@@ -9,8 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import io.andersori.led.api.app.web.util.AccountContext;
 import io.andersori.led.api.domain.entity.Account;
+import io.andersori.led.api.domain.entity.RoleLed;
 import io.andersori.led.api.domain.exception.ConflictException;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
@@ -28,15 +31,20 @@ public class AccountServiceImp implements AccountService {
 	}
 
 	@Override
-	public Account save(Account account)
-			throws UnprocessableEntityException, ConflictException, MethodNotAllowedException {
+	public Account save(Account account) throws ForbiddenExecutionException, UnprocessableEntityException,
+			ConflictException, MethodNotAllowedException {
 
 		ValidatorEntity.validate(account, Account.class);
 
-		if (!repository.findByUsername(account.getUsername()).isPresent()) {
-			repository.save(account);
+		if (account.getRoles().contains(RoleLed.ADMIN) && AccountContext.getAccount().getRoles().contains(RoleLed.ADMIN)) {
+			if (!repository.findByUsername(account.getUsername()).isPresent()) {
+				repository.save(account);
+			} else {
+				throw new ConflictException("The username you entered is alread in use.", Account.class);
+			}
 		} else {
-			throw new ConflictException("The username you entered is alread in use.", Account.class);
+			throw new ForbiddenExecutionException(
+					"You do not have permission to create a user with administrator permission", Account.class);
 		}
 
 		return account;
@@ -47,26 +55,26 @@ public class AccountServiceImp implements AccountService {
 			throws UnprocessableEntityException, ConflictException, NotFoundException, MethodNotAllowedException {
 
 		Account acSaved = findById(id);
-		
-		if(account.getName() != null && !account.getName().equals(acSaved.getName())) {
+
+		if (account.getName() != null && !account.getName().equals(acSaved.getName())) {
 			acSaved.setName(account.getName());
 		}
-		
-		if(account.getUsername() != null && !account.getUsername().equals(acSaved.getUsername())) {
-			if(repository.findByUsername(account.getUsername()).isPresent()) {
+
+		if (account.getUsername() != null && !account.getUsername().equals(acSaved.getUsername())) {
+			if (repository.findByUsername(account.getUsername()).isPresent()) {
 				throw new ConflictException("The username you entered is alread in use.", Account.class);
 			}
 			acSaved.setUsername(account.getUsername());
 		}
-		
-		if(!account.getRoles().containsAll(acSaved.getRoles())) {
+
+		if (!account.getRoles().containsAll(acSaved.getRoles())) {
 			acSaved.setRoles(account.getRoles());
 		}
-		
-		if(account.getPassword() != null) {
+
+		if (account.getPassword() != null) {
 			acSaved.setPassword(account.getPassword());
 		}
-		
+
 		ValidatorEntity.validate(acSaved, Account.class);
 		repository.save(acSaved);
 

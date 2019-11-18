@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import io.andersori.led.api.domain.entity.Account;
 import io.andersori.led.api.domain.entity.RoleLed;
 import io.andersori.led.api.domain.exception.ConflictException;
+import io.andersori.led.api.domain.exception.ForbiddenExecutionException;
 import io.andersori.led.api.domain.exception.MethodNotAllowedException;
 import io.andersori.led.api.domain.exception.NotFoundException;
 import io.andersori.led.api.domain.exception.UnprocessableEntityException;
@@ -15,8 +16,8 @@ import io.andersori.led.api.domain.policy.Restrictions;
 @Service
 public interface AccountService {
 
-	@Restrictions({ RoleLed.ADMIN })
-	Account save(Account account) throws UnprocessableEntityException, ConflictException, MethodNotAllowedException;
+	@Restrictions({ RoleLed.DEFAULT })
+	Account save(Account account) throws ForbiddenExecutionException, UnprocessableEntityException, ConflictException, MethodNotAllowedException;
 
 	@Restrictions({ RoleLed.ADMIN })
 	Account update(Long id, Account account)

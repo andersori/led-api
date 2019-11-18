@@ -58,7 +58,7 @@ public class Account extends Auditable {
 	private Set<RoleLed> roles;
 
 	public Account() {
-		this.roles = new HashSet<RoleLed>(Arrays.asList(RoleLed.NONE));
+		this.roles = new HashSet<RoleLed>(Arrays.asList(RoleLed.DEFAULT));
 	}
 
 }

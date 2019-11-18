@@ -24,7 +24,7 @@ public class App {
 			Spark.before("/*", authorizationFilter);
 			Spark.notFound("");
 			Spark.path("/accounts", accountController);
-			Spark.path("/token", tokenController);
+			Spark.path("/tokens", tokenController);
 			Spark.afterAfter("/*", ResponseTypeFilter.responseType);
 		});
 		

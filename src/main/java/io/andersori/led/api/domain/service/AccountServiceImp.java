@@ -36,16 +36,16 @@ public class AccountServiceImp implements AccountService {
 
 		ValidatorEntity.validate(account, Account.class);
 
-		if (account.getRoles().contains(RoleLed.ADMIN) && AccountContext.getAccount().getRoles().contains(RoleLed.ADMIN)) {
+		//if (account.getRoles().contains(RoleLed.ADMIN) && AccountContext.getAccount().getRoles().contains(RoleLed.ADMIN)) {
 			if (!repository.findByUsername(account.getUsername()).isPresent()) {
 				repository.save(account);
 			} else {
 				throw new ConflictException("The username you entered is alread in use.", Account.class);
 			}
-		} else {
-			throw new ForbiddenExecutionException(
-					"You do not have permission to create a user with administrator permission", Account.class);
-		}
+		//} else {
+			//throw new ForbiddenExecutionException(
+					//"You do not have permission to create a user with administrator permission", Account.class);
+		//}
 
 		return account;
 	}

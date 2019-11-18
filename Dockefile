@@ -1,0 +1,11 @@
+FROM openjdk:11-jre-slim
+
+COPY 
+
+RUN apt update && \
+	apt install postgresql -y && \
+	/etc/init.d/postgresql start && \
+	su - postgres && \
+	psql --command "CREATE USER led WITH SUPERUSER PASSWORD 'postgres';" && \
+	createdb -O led led
+

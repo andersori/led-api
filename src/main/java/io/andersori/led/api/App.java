@@ -18,7 +18,9 @@ public class App {
 		AuthorizationFilter authorizationFilter = context.getBean(AuthorizationFilter.class);
 		AccountController accountController = context.getBean(AccountController.class);
 		TokenController tokenController = context.getBean(TokenController.class);
-				
+
+		Spark.port(System.getProperty("server.port") != null ? Integer.parseInt(System.getProperty("PORT")) : 8080);
+
 		Spark.path("/api", () -> {
 			Spark.before("/*", authorizationFilter);
 			Spark.notFound("");
@@ -26,7 +28,7 @@ public class App {
 			Spark.path("/tokens", tokenController);
 			Spark.afterAfter("/*", ResponseTypeFilter.responseType);
 		});
-		
+
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			((ConfigurableApplicationContext) context).close();
 		}));

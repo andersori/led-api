@@ -168,6 +168,14 @@
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
@@ -188,8 +196,7 @@
 					<appName>${project.name}</appName>
 					<jdkVersion>${java.version}</jdkVersion>
 					<processTypes>
-						<web>java $JAVA_OPTS -cp target/classes:target/dependency/*
-							io.andersori.led.api.App</web>
+						<web>java -jar -Dserver.port=${PORT} target/${project.name}-jar-with-dependencies.jar</web>
 					</processTypes>
 				</configuration>
 			</plugin>

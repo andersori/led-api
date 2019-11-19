@@ -195,7 +195,7 @@
 				<configuration>
 					<jdkVersion>${java.version}</jdkVersion>
 					<processTypes>
-						<web>java $JAVA_OPTS -jar -Dserver.port=${PORT} target/${project.name}-jar-with-dependencies.jar</web>
+						<web>java $JAVA_OPTS -jar -Dserver.port=${PORT} target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</web>
 					</processTypes>
 				</configuration>
 			</plugin>

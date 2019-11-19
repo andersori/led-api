@@ -11,7 +11,7 @@
 	<name>led-api</name>
 
 	<properties>
-		<java.version>11</java.version>
+		<maven.java.version>11</maven.java.version>
 	</properties>
 
 	<dependencies>
@@ -140,13 +140,14 @@
 
 	<build>
 		<finalName>${project.name}</finalName>
+
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>${maven.java.version}</source>
+					<target>${maven.java.version}</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -156,6 +157,12 @@
 				<version>3.1.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
+					<resources>
+						<resource>
+							<directory>src/main/resources</directory>
+							<filtering>true</filtering>
+						</resource>
+					</resources>
 				</configuration>
 			</plugin>
 

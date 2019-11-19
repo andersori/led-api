@@ -12,147 +12,128 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<junit.version>3.8.1</junit.version>
-		<lombok.version>1.18.10</lombok.version>
-		<spring.data.jpa.version>2.2.1.RELEASE</spring.data.jpa.version>
-		<hibernate-core.version>5.4.8.Final</hibernate-core.version>
-		<hikariCP.version>3.4.1</hikariCP.version>
-		<spring-context.version>5.2.1.RELEASE</spring-context.version>
-		<spring-core.version>5.2.1.RELEASE</spring-core.version>
-		<spring-aspects.version>5.2.1.RELEASE</spring-aspects.version>
-		<postgresql.version>42.2.8</postgresql.version>
-		<flayway.version>6.0.7</flayway.version>
-		<spark.version>2.9.1</spark.version>
-		<jackson-databind.version>2.10.0</jackson-databind.version>
-		<jbcrypt.version>0.4</jbcrypt.version>
-		<java-jwt.version>3.8.2</java-jwt.version>
-		<hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
-		<javax.el-api.version>3.0.0</javax.el-api.version>
-		<javax.el.version>3.0.0</javax.el.version>
-		<org.slf4j.version>1.7.29</org.slf4j.version>
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${org.slf4j.version}</version>
+			<version>1.7.29</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${org.slf4j.version}</version>
+			<version>1.7.29</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson-databind.version}</version>
+			<version>2.10.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>javax.el-api</artifactId>
-			<version>${javax.el-api.version}</version>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
-			<version>${javax.el.version}</version>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
-			<version>${java-jwt.version}</version>
+			<version>3.8.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
-			<version>${jbcrypt.version}</version>
+			<version>0.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${jackson-databind.version}</version>
+			<version>2.10.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>${spring-core.version}</version>
+			<version>5.2.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
-			<version>${spring-aspects.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sparkjava</groupId>
-			<artifactId>spark-core</artifactId>
-			<version>${spark.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${postgresql.version}</version>
+			<version>5.2.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring-context.version}</version>
+			<version>5.2.1.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sparkjava</groupId>
+			<artifactId>spark-core</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>${hikariCP.version}</version>
+			<version>3.4.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate-core.version}</version>
+			<version>5.4.8.Final</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate-validator.version}</version>
+			<version>6.1.0.Final</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
+			<version>1.18.10</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>${spring.data.jpa.version}</version>
+			<version>2.2.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>${flayway.version}</version>
+			<version>6.0.7</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
+			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -169,6 +150,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.1.0</version>
@@ -176,6 +158,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -189,6 +172,7 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>com.heroku.sdk</groupId>
 				<artifactId>heroku-maven-plugin</artifactId>
@@ -197,21 +181,38 @@
 					<appName>${project.name}</appName>
 					<jdkVersion>${java.version}</jdkVersion>
 					<processTypes>
-						<web>java $JAVA_OPTS -cp target/classes:target/dependency/* io.andersori.led.api.App</web>
+						<web>java $JAVA_OPTS -cp target/classes:target/dependency/*
+							io.andersori.led.api.App</web>
 					</processTypes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<version>${flayway.version}</version>
-				<configuration>
-					<url>jdbc:postgresql://localhost:5432/led</url>
-					<user>led</user>
-					<password>postgres</password>
-					<schemas>led</schemas>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>db</id>
+			<properties>
+				<db.ip>localhost</db.ip>
+				<db.port>5432</db.port>
+				<db.path>led</db.path>
+				<db.user>led</db.user>
+				<db.password>postgres</db.password>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.flywaydb</groupId>
+						<artifactId>flyway-maven-plugin</artifactId>
+						<version>6.0.7</version>
+						<configuration>
+							<url>jdbc:postgresql://${db.ip}:${db.port}/${db.path}</url>
+							<user>${db.user}</user>
+							<password>${db.password}</password>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

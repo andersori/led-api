@@ -18,8 +18,7 @@ public class App {
 		AuthorizationFilter authorizationFilter = context.getBean(AuthorizationFilter.class);
 		AccountController accountController = context.getBean(AccountController.class);
 		TokenController tokenController = context.getBean(TokenController.class);
-		
-		
+				
 		Spark.path("/api", () -> {
 			Spark.before("/*", authorizationFilter);
 			Spark.notFound("");

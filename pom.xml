@@ -186,7 +186,7 @@
 				<version>2.0.13</version>
 				<configuration>
 					<appName>${project.name}</appName>
-					<jdkVersion>${java.version}</jdkVersion>
+					<jdkVersion>${maven.java.version}</jdkVersion>
 					<processTypes>
 						<web>java $JAVA_OPTS -cp target/classes:target/dependency/*
 							io.andersori.led.api.App</web>

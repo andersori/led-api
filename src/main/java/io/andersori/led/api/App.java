@@ -19,7 +19,7 @@ public class App {
 		AccountController accountController = context.getBean(AccountController.class);
 		TokenController tokenController = context.getBean(TokenController.class);
 
-		Spark.port(System.getProperty("server.port") != null ? Integer.parseInt(System.getProperty("PORT")) : 8080);
+		Spark.port(System.getProperty("server.port") != null ? Integer.parseInt(System.getProperty("server.port")) : 8080);
 
 		Spark.path("/api", () -> {
 			Spark.before("/*", authorizationFilter);
